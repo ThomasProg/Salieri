@@ -10,13 +10,14 @@ struct Serialize<std::array<T, SIZE>, CONTEXT_TYPE, DATA_INFO>
 {
     void operator()(std::vector<T>& container, CONTEXT_TYPE& context, const DATA_INFO& info)
     {
-        // std::cout << "vec T serialized : "  << std::endl;
-        // data.serialize(context);
-        // serialize();
+        OnSerializationStart<std::vector<T>, CONTEXT, DATA_INFO>{}(container, context, info);
+
         for (auto&& elem : container)
         {
             serialize(elem, context, /*info.makeNewInfo()*/info);
         }
+
+        OnSerializationStart<std::vector<T>, CONTEXT, DATA_INFO>{}(container, context, info);
     }
 };
 }
