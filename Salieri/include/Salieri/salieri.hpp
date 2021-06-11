@@ -3,6 +3,10 @@
 namespace slr
 {
 
+// ===============================================================================//
+// ======================== SET DEFAULT CONTEXT AND INFO ======================== // 
+// ===============================================================================//
+
 class BinaryContext
 {
 
@@ -15,6 +19,19 @@ class SafeDataInfo
 
 using DefaultContext  = BinaryContext;
 using DefaultDataInfo = SafeDataInfo; 
+
+// ===============================================================================//
+// ================================== PRESETS =================================== // 
+// ===============================================================================//
+
+class Inspecting;
+class Saving;
+class Loading;
+
+// ===============================================================================//
+// ======================== SET BASE SERIALIZE FUNCTIONS ======================== // 
+// ===============================================================================//
+
 
 template<class DATA, class CONTEXT, class DATA_INFO>
 struct Serialize
@@ -42,6 +59,21 @@ struct OnSerializationEnd
 
     }
 };
+
+template<class T>
+struct LoaderType
+{
+    T& v;
+
+    LoaderType(T& newV) : v(newV)
+    {
+        
+    }
+};
+
+// ===============================================================================//
+// ============================== UTILITY FUNCTION ============================== // 
+// ===============================================================================//
 
 template<class DATA, class CONTEXT = DefaultContext, class DATA_INFO = DefaultDataInfo>
 void serialize(DATA&& data, CONTEXT&& context = DefaultContext(), const DATA_INFO& info = DefaultDataInfo())

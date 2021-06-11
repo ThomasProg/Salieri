@@ -1,3 +1,0 @@
-cmake -B Build/
-cmake --build Build
-./Build/SalieriTest

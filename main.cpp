@@ -2,11 +2,8 @@
 #include <vector>
 
 #include <Salieri/salieri.hpp>
-#include <Salieri/std/vector.hpp>
-
-
-
-
+#include <Salieri/Inspector/std/vector.hpp>
+#include <Salieri/Displayer/primitives.hpp>
 
 // template< class T, class CONTEXT, class DATA_INFO>
 // struct Serialize<std::vector<T>, CONTEXT, DATA_INFO>
@@ -32,12 +29,6 @@
 // }
 
 
-
-
-
-
-
-
 int main()
 {
     std::cout << "Hello" << std::endl;
@@ -47,8 +38,12 @@ int main()
     std::vector<float> container;
     for (int i = 0; i < 10; i++)
     {
-        container.emplace_back(i);
+        container.emplace_back(float(i));
     }
-    slr::DefaultContext context;
-    slr::serialize(container, context);
+
+    slr::serialize(container, slr::DisplayContext());
+
+    const char* s ="Hello world!";
+    slr::serialize(s, slr::DisplayContext());
+    slr::serialize("Test array !", slr::DisplayContext());
 }

@@ -17,7 +17,7 @@ struct Serialize<std::vector<T>, CONTEXT, DATA_INFO>
             serialize(elem, context, /*info.makeNewInfo()*/info);
         }
 
-        OnSerializationStart<std::vector<T>, CONTEXT, DATA_INFO>{}(container, context, info);
+        OnSerializationEnd<std::vector<T>, CONTEXT, DATA_INFO>{}(container, context, info);
     }
 };
 }

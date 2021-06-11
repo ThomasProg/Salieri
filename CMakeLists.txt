@@ -15,4 +15,4 @@ add_executable(SalieriTest main.cpp)
 
 target_link_libraries(SalieriTest PUBLIC Salieri)
 
-target_include_directories(Salieri PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/Salieri/include")
+target_include_directories(Salieri PUBLIC "${PROJECT_SOURCE_DIR}/Salieri/include")
