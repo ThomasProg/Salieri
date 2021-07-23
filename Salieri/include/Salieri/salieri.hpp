@@ -1,5 +1,9 @@
 #pragma once
 
+#include <type_traits>
+// #include <unordered_map>
+// #include <map>
+
 namespace slr
 {
 
@@ -7,9 +11,23 @@ namespace slr
 // ======================== SET DEFAULT CONTEXT AND INFO ======================== // 
 // ===============================================================================//
 
-class BinaryContext
+template<class KeyType>
+class SharedPtrSupport
 {
+private:
+    // std::unordered_map<KeyType, void*> sharedPtrs;
 
+protected:
+    void* retrieve()
+    {
+        return nullptr;
+    }
+};
+
+class BaseContext
+{
+public:
+    // std::map<void*, LoadedPtr> alreadyLoadedPtrs;
 };
 
 class SafeDataInfo
@@ -17,16 +35,8 @@ class SafeDataInfo
 
 };
 
-using DefaultContext  = BinaryContext;
+using DefaultContext  = BaseContext;
 using DefaultDataInfo = SafeDataInfo; 
-
-// ===============================================================================//
-// ================================== PRESETS =================================== // 
-// ===============================================================================//
-
-class Inspecting;
-class Saving;
-class Loading;
 
 // ===============================================================================//
 // ======================== SET BASE SERIALIZE FUNCTIONS ======================== // 
@@ -39,35 +49,6 @@ struct Serialize
     void operator()(DATA& data, CONTEXT& context, const DATA_INFO& info)
     {
         data.serialize(context);
-    }
-};
-
-template<class DATA, class CONTEXT, class DATA_INFO>
-struct OnSerializationStart
-{
-    inline void operator()(DATA& data, CONTEXT& context, const DATA_INFO& info)
-    {
-
-    }
-};
-
-template<class DATA, class CONTEXT, class DATA_INFO>
-struct OnSerializationEnd
-{
-    inline void operator()(DATA& data, CONTEXT& context, const DATA_INFO& info)
-    {
-
-    }
-};
-
-template<class T>
-struct LoaderType
-{
-    T& v;
-
-    LoaderType(T& newV) : v(newV)
-    {
-        
     }
 };
 

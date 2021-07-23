@@ -2,7 +2,7 @@
 
 namespace slr
 {
-class DisplayContext
+class CoutContext
 {
 
 };
