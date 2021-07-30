@@ -7,6 +7,7 @@ project(SalieriTest VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Debug)
 
 # add the Salieri library
 add_subdirectory(Salieri)
