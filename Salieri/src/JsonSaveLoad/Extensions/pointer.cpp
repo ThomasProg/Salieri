@@ -11,9 +11,9 @@ void SaveContextPointerExtension::saveFileObject(slr::JsonSaveContext& context, 
     auto v = alreadySavedObjects.find(name);
     if (v == alreadySavedObjects.end())
     {
-        alreadySavedObjects.emplace(name, this); // TODO : can be optimized
-        slr::JsonSaveContext newContext = slr::JsonSaveContext(*this);
-        saveObject(newContext, obj);
+        slr::JsonSaveContext* newContext = new slr::JsonSaveContext(*this);
+        alreadySavedObjects.emplace(name, newContext); // TODO : can be optimized
+        saveObject(*newContext, obj);
     }
 }
 

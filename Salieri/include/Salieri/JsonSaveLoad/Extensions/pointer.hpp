@@ -12,9 +12,9 @@ namespace slr
 namespace json
 {
 
-class SaveContextPointerExtension : public slr::JsonSaveContext::DefaultExtension
+class SaveContextPointerExtension : public slr::DefaultSaveExtension
 {
-private:
+public:
     std::map<std::string /* name */, slr::JsonSaveContext* /* not null */> alreadySavedObjects;
 
 public:
@@ -23,7 +23,7 @@ public:
     void saveFileObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj, const std::string& name);
 };
 
-class LoadContextPointerExtension : public slr::JsonLoadContext::DefaultExtension
+class LoadContextPointerExtension : public slr::DefaultLoadExtension
 {
 public:
     using ObjectType = slr::Object<slr::JsonLoadContext>;
@@ -61,7 +61,6 @@ struct JsonFileAccess<std::shared_ptr<T>>
         // TODO : multithread
         T* ptr =  data.get();
         bool doesPtrExist = ptr != nullptr;
-        slr::serialize(doesPtrExist, context, slr::JsonSaveInfo("isNull"));
         if (doesPtrExist)
         {
             std::string name = ptr->getName();
@@ -73,14 +72,19 @@ struct JsonFileAccess<std::shared_ptr<T>>
             // SaveContextPointerExtension& extension = static_cast<SaveContextPointerExtension&>(context.shared);
             extension.saveFileObject(context, *data.get(), name);
         }
+        else 
+        {
+            slr::serialize(nullptr, context, slr::JsonSaveInfo(info.getName()));
+        }
     }
     void load(std::shared_ptr<T>& data, JsonLoadContext& context, const JsonLoadInfo& info)
     {
         // TODO : multithread
-        bool doesPtrExist;
-        slr::serialize(doesPtrExist, context, slr::JsonLoadInfo("isNull"));
+        // bool doesPtrExist;
+        // std::string s;
+        // slr::serialize(s, context, slr::JsonLoadInfo(info.getName()));
 
-        if (doesPtrExist)
+        if (!context.isNull(info.getName()))
         {
             std::string name;
             slr::serialize(name, context, slr::JsonLoadInfo(info.getName()));

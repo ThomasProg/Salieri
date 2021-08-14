@@ -67,13 +67,7 @@ public:
 class JsonSaveContext : public BaseJsonContext
 {
 public:
-    class DefaultExtension
-    {  
-    public:
-
-        virtual ~DefaultExtension() = default;
-
-    }& shared;
+    class DefaultSaveExtension& shared;
 
 public:
 
@@ -89,8 +83,25 @@ public:
         getLastJsonObject()[name] = value;
     }
 
-    JsonSaveContext(const std::string& filename, DefaultExtension& sharedContext);
+    JsonSaveContext(DefaultSaveExtension& sharedContext);
 };
+
+class DefaultSaveExtension
+{  
+public:
+    JsonSaveContext globalContext = JsonSaveContext(*this);
+
+    virtual ~DefaultSaveExtension() = default;
+};
+
+template<typename DATA_TYPE>
+struct Serialize<DATA_TYPE, DefaultSaveExtension, JsonSaveInfo>
+{
+    void operator()(DATA_TYPE& data, DefaultSaveExtension& context, const JsonSaveInfo& info)
+    {
+        slr::serialize(data, context.globalContext, info);
+    }
+};  
 
 class JsonLoadInfo
 {
@@ -111,14 +122,7 @@ public:
 class JsonLoadContext : public BaseJsonContext
 {
 public:
-    class DefaultExtension
-    {
-    
-    public:
-
-        virtual ~DefaultExtension() = default;
-
-    }& shared;
+    class DefaultLoadExtension& shared;
 
 public:
     template<typename T>
@@ -127,18 +131,41 @@ public:
         getLastJsonObject()[name].get_to(value);
     }
 
+    bool isNull(const std::string& name)
+    {
+        return getLastJsonObject()[name].is_null();
+    }
+
     void parse(const std::string& jsonStr)
     {
         mainJson = nlohmann::json::parse(jsonStr);
     }
 
-    JsonLoadContext(DefaultExtension& sharedContext);
+    JsonLoadContext(DefaultLoadExtension& sharedContext);
 };
+
+class DefaultLoadExtension
+{
+
+public:
+    JsonLoadContext globalContext = JsonLoadContext(*this);
+    virtual ~DefaultLoadExtension() = default;
+
+};
+
+template<typename DATA_TYPE>
+struct Serialize<DATA_TYPE, DefaultLoadExtension, JsonLoadInfo>
+{
+    void operator()(DATA_TYPE& data, DefaultLoadExtension& context, const JsonLoadInfo& info)
+    {
+        slr::serialize(data, context.globalContext, info);
+    }
+};  
 
 class JsonSaveLoadContext : public JsonSaveContext, public JsonLoadContext
 {
 public:
-    JsonSaveLoadContext(JsonSaveContext::DefaultExtension& saveSharedContext, JsonLoadContext::DefaultExtension& loadSharedContext)
+    JsonSaveLoadContext(DefaultSaveExtension& saveSharedContext, DefaultLoadExtension& loadSharedContext)
         : JsonSaveContext(saveSharedContext), JsonLoadContext(loadSharedContext)
     {
 

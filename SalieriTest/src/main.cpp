@@ -133,6 +133,39 @@ slr::LoadContextPointerExtension::ObjectType* BinaryLoadContextExtension::loadOb
     return ptr;
 }
 
+
+class JsonSaveContextExtension : public slr::json::SaveContextPointerExtension
+{
+    virtual void saveObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj) override;
+};
+
+void JsonSaveContextExtension::saveObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj)
+{
+    // Save Object type info
+    // size_t typeID = obj.getTypeID();
+    // slr::serialize(typeID, context, slr::JsonSaveInfo());
+
+    // Save Object insides
+    // slr::serialize(obj, context, slr::JsonSaveInfo("obj"));
+    obj.serialize(context);
+}
+
+class JsonLoadContextExtension : public slr::json::LoadContextPointerExtension
+{
+    virtual ObjectType* loadObject(slr::JsonLoadContext& context) override;
+};
+
+slr::json::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::loadObject(slr::JsonLoadContext& context)
+{
+    // size_t typeID;
+    // slr::serialize(typeID, context, slr::JsonLoadInfo());
+    LoadContextPointerExtension::ObjectType* ptr = new Bar();
+    // slr::serialize(*ptr, context, slr::JsonLoadInfo("obj"));
+    ptr->serialize(context);
+    return ptr;
+}
+
+
 void saveTest()
 {
     Foo f;
@@ -264,8 +297,9 @@ int main()
     std::string file;
 
     {
-        slr::JsonSaveContext::DefaultExtension shared1;
-        slr::JsonSaveContext context(shared1);
+        JsonSaveContextExtension shared1;
+        auto& context = shared1.globalContext;
+        // slr::JsonSaveContext context(shared1);
         float f = 0.1f;
         // slr::JsonSaveContext::DefaultExtension shared;
         // slr::JsonSaveContext context(shared);
@@ -276,17 +310,25 @@ int main()
         slr::serialize(str, context, slr::JsonSaveInfo("str"));
         Foo foo;
         foo.a = 9;
+        foo.bar = std::make_shared<Bar>();
         slr::serialize(foo, context, slr::JsonSaveInfo("foo"));
 
-        std::cout << context.JsonSaveContext::getJson() << std::endl;
+        std::cout << shared1.globalContext.getJson() << std::endl;
 
-        file = context.JsonSaveContext::getJson();
+        for (const auto& [key, v] : shared1.alreadySavedObjects)
+        {
+            // std::cout << key << std::endl;
+            std::cout << v->getJson() << std::endl;
+        }
+
+        file = shared1.globalContext.getJson();
     }
 
     {
-        slr::JsonLoadContext::DefaultExtension shared1;
-        slr::JsonLoadContext context(shared1);
-        context.parse(file);
+        JsonLoadContextExtension shared1;
+        auto& context = shared1.globalContext;
+        // slr::JsonLoadContext context(shared1);
+        shared1.globalContext.parse(file);
         float f;
         // slr::JsonSaveContext::DefaultExtension shared;
         // slr::JsonSaveContext context(shared);

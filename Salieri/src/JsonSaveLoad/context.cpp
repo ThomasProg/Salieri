@@ -10,13 +10,13 @@
 namespace slr
 {
 
-JsonSaveContext::JsonSaveContext(const std::string& filename, DefaultExtension& sharedContext)
+JsonSaveContext::JsonSaveContext(DefaultSaveExtension& sharedContext)
     : shared(sharedContext)
 {
 
 }
 
-JsonLoadContext::JsonLoadContext(DefaultExtension& sharedContext)
+JsonLoadContext::JsonLoadContext(DefaultLoadExtension& sharedContext)
     : shared(sharedContext)
 {
 

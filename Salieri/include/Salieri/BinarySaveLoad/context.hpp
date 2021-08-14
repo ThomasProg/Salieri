@@ -30,7 +30,7 @@ public:
     {  
     public:
 
-        slr::BinarySaveContext globalContext = slr::BinarySaveContext("__global", *this);
+        // slr::BinarySaveContext globalContext = slr::BinarySaveContext("__global", *this);
         virtual ~DefaultExtension() = default;
 
     }& shared;
