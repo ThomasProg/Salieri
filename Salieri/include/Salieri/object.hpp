@@ -13,53 +13,53 @@ public:
 };
 
 
-struct ControlBlock 
-{
-    void* object = nullptr;
-    std::atomic<std::size_t> useCount;
+// struct ControlBlock 
+// {
+//     void* object = nullptr;
+//     std::atomic<std::size_t> useCount;
 
-    ControlBlock()
-    {
-        useCount = 0;
-    }
-};
+//     ControlBlock()
+//     {
+//         useCount = 0;
+//     }
+// };
 
-template<typename T>
-class ControlBlockPtr
-{
-private:
-    ControlBlock* controlBlock = nullptr;
+// template<typename T>
+// class ControlBlockPtr
+// {
+// private:
+//     ControlBlock* controlBlock = nullptr;
 
-public:
-    ~ControlBlockPtr()
-    {
-        if (controlBlock != nullptr)
-        {
-            controlBlock->useCount--;
-        }
-    }
+// public:
+//     ~ControlBlockPtr()
+//     {
+//         if (controlBlock != nullptr)
+//         {
+//             controlBlock->useCount--;
+//         }
+//     }
 
-    void assign(ControlBlock* newControlBlock)
-    {
-        if (controlBlock != nullptr)
-        {
-            controlBlock->useCount--;
-        }
+//     void assign(ControlBlock* newControlBlock)
+//     {
+//         if (controlBlock != nullptr)
+//         {
+//             controlBlock->useCount--;
+//         }
 
-        controlBlock = newControlBlock;
+//         controlBlock = newControlBlock;
 
-        if (controlBlock != nullptr)
-            controlBlock->useCount++;
-    }
+//         if (controlBlock != nullptr)
+//             controlBlock->useCount++;
+//     }
 
-    T* get()
-    {
-        if (controlBlock == nullptr)
-            return nullptr;
+//     T* get()
+//     {
+//         if (controlBlock == nullptr)
+//             return nullptr;
 
-        return static_cast<T*>(controlBlock->object);
-    }
-};
+//         return static_cast<T*>(controlBlock->object);
+//     }
+// };
 
 
 // template<typename T>

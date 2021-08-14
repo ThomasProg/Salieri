@@ -12,18 +12,18 @@ namespace slr
 // ======================== SET DEFAULT CONTEXT AND INFO ======================== // 
 // ===============================================================================//
 
-template<class KeyType>
-class SharedPtrSupport
-{
-private:
-    // std::unordered_map<KeyType, void*> sharedPtrs;
+// template<class KeyType>
+// class SharedPtrSupport
+// {
+// private:
+//     // std::unordered_map<KeyType, void*> sharedPtrs;
 
-protected:
-    void* retrieve()
-    {
-        return nullptr;
-    }
-};
+// protected:
+//     void* retrieve()
+//     {
+//         return nullptr;
+//     }
+// };
 
 class BaseContext
 {
