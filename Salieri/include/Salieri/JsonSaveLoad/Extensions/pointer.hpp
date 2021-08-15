@@ -34,6 +34,8 @@ private:
     std::map<std::string, std::shared_ptr<ObjectType>> objectsMap;
 
 public:   
+    std::map<std::string /* name */, slr::JsonLoadContext* /* not null */> alreadySavedObjects;
+
     std::function<void(slr::Object<slr::JsonLoadContext>*)> loadedObjectInstanceDeleter = std::default_delete<slr::Object<slr::JsonLoadContext>>();
 
     // std::string loadFolder = sSaveFolder;

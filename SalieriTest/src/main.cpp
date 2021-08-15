@@ -295,6 +295,9 @@ int main()
     // p["o"] = "3";
 
     std::string file;
+    std::string file2;
+
+    std::string objName;
 
     {
         JsonSaveContextExtension shared1;
@@ -311,12 +314,15 @@ int main()
         Foo foo;
         foo.a = 9;
         foo.bar = std::make_shared<Bar>();
+        foo.bar->h = 100;
         slr::serialize(foo, context, slr::JsonSaveInfo("foo"));
 
         std::cout << shared1.globalContext.getJson() << std::endl;
 
         for (const auto& [key, v] : shared1.alreadySavedObjects)
         {
+            objName = key;
+            file2 = v->getJson();
             // std::cout << key << std::endl;
             std::cout << v->getJson() << std::endl;
         }
@@ -326,6 +332,9 @@ int main()
 
     {
         JsonLoadContextExtension shared1;
+        slr::JsonLoadContext* c = new slr::JsonLoadContext(shared1);
+        c->parse(file2);
+        shared1.alreadySavedObjects.emplace(objName, c);
         auto& context = shared1.globalContext;
         // slr::JsonLoadContext context(shared1);
         shared1.globalContext.parse(file);
@@ -342,6 +351,7 @@ int main()
 
         std::cout << f << " / " << u << " / " << str << std::endl;
         std::cout << foo.a << std::endl;
+        std::cout << foo.bar->h << std::endl;
     }
 }
 

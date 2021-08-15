@@ -22,7 +22,8 @@ void SaveContextPointerExtension::saveFileObject(slr::JsonSaveContext& context, 
 
 LoadContextPointerExtension::ObjectType* LoadContextPointerExtension::loadFileObject(const std::string& objectName)
 {
-    slr::JsonLoadContext newContext = slr::JsonLoadContext(*this);
+    // slr::JsonLoadContext newContext = slr::JsonLoadContext(*this);
+    auto& newContext = *alreadySavedObjects[objectName];
     return loadObject(newContext);
 }
 
