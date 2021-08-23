@@ -6,16 +6,21 @@ namespace slr
 {
     struct Exception : public std::exception
     {
-        const char* desc;
+        std::string desc;
 
         Exception(const char* description) : desc(description)
         {
 
         }
 
+        Exception(const std::string& description) : desc(description)
+        {
+
+        }
+
         const char* what() const throw() final
         {
-            return desc;
+            return desc.c_str();
         }
     };
 }

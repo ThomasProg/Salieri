@@ -1,5 +1,6 @@
 #include <Salieri/JsonSaveLoad/Extensions/pointer.hpp>
 #include <Salieri/JsonSaveLoad/primitives.hpp>
+#include <Salieri/file.hpp>
 
 namespace slr
 {
@@ -17,7 +18,18 @@ void SaveContextPointerExtension::saveFileObject(slr::JsonSaveContext& context, 
     }
 }
 
+void SaveContextPointerExtension::toDisk(const std::string& directory, const std::string& globalContextName) 
+{
+    DefaultSaveExtension::toDisk(directory, globalContextName);
 
+    for (const auto& [key, v] : alreadySavedObjects)
+    {
+        slr::WriteFile file = directory + key;
+        file << v->getJson();
+
+        std::cout << v->getJson() << std::endl;
+    }
+}
 
 
 LoadContextPointerExtension::ObjectType* LoadContextPointerExtension::loadFileObject(const std::string& objectName)

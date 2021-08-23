@@ -7,6 +7,8 @@
 #include <cassert>
 #include <iostream>
 
+#include <Salieri/file.hpp>
+
 namespace slr
 {
 
@@ -20,6 +22,12 @@ JsonLoadContext::JsonLoadContext(DefaultLoadExtension& sharedContext)
     : shared(sharedContext)
 {
 
+}
+
+void DefaultSaveExtension::toDisk(const std::string& directory, const std::string& globalContextName)
+{
+    slr::WriteFile file = directory + globalContextName;
+    file << globalContext.getJson();
 }
 
 }

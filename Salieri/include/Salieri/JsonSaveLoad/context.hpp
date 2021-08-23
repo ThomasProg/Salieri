@@ -4,6 +4,7 @@
 #include <Salieri/object.hpp>
 #include <Salieri/JsonSaveLoad/fwd.hpp>
 #include <Salieri/JsonSaveLoad/json.hpp>
+#include <Salieri/exceptions.hpp>
 
 #include <stack>
 
@@ -91,6 +92,8 @@ class DefaultSaveExtension
 public:
     JsonSaveContext globalContext = JsonSaveContext(*this);
 
+    virtual void toDisk(const std::string& directory = "SavedJSON/", const std::string& globalContextName = "__global");
+
     virtual ~DefaultSaveExtension() = default;
 };
 
@@ -128,6 +131,10 @@ public:
     template<typename T>
     void load(const std::string& name, T& value)
     {
+        if (isNull(name))
+        {
+            throw slr::Exception(("Could not load value : " + name).c_str());
+        }
         getLastJsonObject()[name].get_to(value);
     }
 
@@ -151,6 +158,7 @@ public:
     JsonLoadContext globalContext = JsonLoadContext(*this);
     virtual ~DefaultLoadExtension() = default;
 
+    virtual void fromDisk(const std::string& directory = "SavedJSON/", const std::string& globalContextName = "__global");
 };
 
 template<typename DATA_TYPE>

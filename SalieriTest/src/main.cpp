@@ -153,6 +153,7 @@ void JsonSaveContextExtension::saveObject(slr::JsonSaveContext& context, slr::Ob
 class JsonLoadContextExtension : public slr::json::LoadContextPointerExtension
 {
     virtual ObjectType* loadObject(slr::JsonLoadContext& context) override;
+    virtual ObjectType* loadFileObject(const std::string& objectName) override; // Loads an object from another context
 };
 
 slr::json::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::loadObject(slr::JsonLoadContext& context)
@@ -165,6 +166,31 @@ slr::json::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::lo
     return ptr;
 }
 
+#include <fstream>
+#include <iostream>
+#include <sstream> //std::stringstream
+
+#include <Salieri/file.hpp>
+
+JsonLoadContextExtension::ObjectType* JsonLoadContextExtension::loadFileObject(const std::string& objectName)
+{
+    auto it = alreadySavedObjects.find(objectName);
+    slr::JsonLoadContext* newContext; 
+    if (it == alreadySavedObjects.end()) 
+    {
+        // Load new file
+        newContext = new slr::JsonLoadContext(*this);
+        slr::ReadFile f = ("SavedJSON/" + objectName);
+        newContext->parse(f.toStr());
+        alreadySavedObjects.emplace(objectName, newContext);
+    }
+    else 
+    {
+        // Use already loaded file
+        newContext = it->second;
+    }
+    return loadObject(*newContext);
+}
 
 void saveTest()
 {
@@ -294,10 +320,9 @@ int main()
     // p = nlohmann::json::object();
     // p["o"] = "3";
 
-    std::string file;
-    std::string file2;
+    // std::string file;
 
-    std::string objName;
+    std::string dirName = "SavedJSON/";
 
     {
         JsonSaveContextExtension shared1;
@@ -317,30 +342,18 @@ int main()
         foo.bar->h = 100;
         slr::serialize(foo, context, slr::JsonSaveInfo("foo"));
 
-        std::cout << shared1.globalContext.getJson() << std::endl;
-
-        for (const auto& [key, v] : shared1.alreadySavedObjects)
-        {
-            objName = key;
-            file2 = v->getJson();
-            // std::cout << key << std::endl;
-            std::cout << v->getJson() << std::endl;
-        }
-
-        file = shared1.globalContext.getJson();
+        shared1.toDisk(dirName);
     }
 
     {
         JsonLoadContextExtension shared1;
-        slr::JsonLoadContext* c = new slr::JsonLoadContext(shared1);
-        c->parse(file2);
-        shared1.alreadySavedObjects.emplace(objName, c);
         auto& context = shared1.globalContext;
-        // slr::JsonLoadContext context(shared1);
-        shared1.globalContext.parse(file);
+        slr::ReadFile file = dirName + "__global";
+        shared1.globalContext.parse(file.toStr());
+
+        shared1.fromDisk(dirName);
+
         float f;
-        // slr::JsonSaveContext::DefaultExtension shared;
-        // slr::JsonSaveContext context(shared);
         slr::serialize(f, context, slr::JsonLoadInfo("f"));
         int u;
         slr::serialize(u, context, slr::JsonLoadInfo("u"));

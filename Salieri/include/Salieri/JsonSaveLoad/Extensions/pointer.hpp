@@ -18,7 +18,7 @@ public:
     std::map<std::string /* name */, slr::JsonSaveContext* /* not null */> alreadySavedObjects;
 
 public:
-
+    virtual void toDisk(const std::string& directory = "SavedJSON/", const std::string& globalContextName = "__global") override;
     virtual void saveObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj) = 0;
     void saveFileObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj, const std::string& name);
 };
@@ -45,8 +45,8 @@ public:
      * 
      * @return ObjectType* Non null object 
      */
-    virtual ObjectType* loadObject(slr::JsonLoadContext& context) = 0;
-    ObjectType* loadFileObject(const std::string& objectName);
+    virtual ObjectType* loadObject(slr::JsonLoadContext& context) = 0; // Loads an object from the current context
+    virtual ObjectType* loadFileObject(const std::string& objectName); // Loads an object from another context
     std::shared_ptr<ObjectType> loadSharedFileObject(slr::JsonLoadContext& context, const std::string& objectName);
     std::weak_ptr<ObjectType> loadWeakFileObject(slr::JsonLoadContext& context, const std::string& objectName);
 };
