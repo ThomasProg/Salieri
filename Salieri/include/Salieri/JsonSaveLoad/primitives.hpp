@@ -11,11 +11,11 @@ namespace slr
 template<>                                          \
 struct JsonFileAccess<DATA_TYPE>                             \
 {\
-    void save(const DATA_TYPE& data, JsonSaveContext& context, const JsonSaveInfo& info)\
+    void save(const DATA_TYPE& data, json::JsonSaveContext& context, const json::JsonSaveInfo& info)\
     {\
         context.save(info.getName(), data);\
     }\
-    void load(DATA_TYPE& data, JsonLoadContext& context, const JsonLoadInfo& info)\
+    void load(DATA_TYPE& data, json::JsonLoadContext& context, const json::JsonLoadInfo& info)\
     {\
         context.load(info.getName(), data);\
     }\

@@ -11,6 +11,8 @@
 
 namespace slr
 {
+namespace json
+{
 
 JsonSaveContext::JsonSaveContext(DefaultSaveExtension& sharedContext)
     : shared(sharedContext)
@@ -30,4 +32,11 @@ void DefaultSaveExtension::toDisk(const std::string& directory, const std::strin
     file << globalContext.getJson();
 }
 
+void DefaultLoadExtension::fromDisk(const std::string& directory, const std::string& globalContextName)
+{
+    slr::ReadFile file = directory + globalContextName;
+    globalContext.parse(file.toStr());
+}
+
+}
 }

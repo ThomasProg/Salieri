@@ -20,7 +20,7 @@
 
 #include <Salieri/exceptions.hpp>
 
-class Bar : public slr::Object<slr::BinarySaveLoadContext>, public slr::Object<slr::JsonSaveLoadContext>
+class Bar : public slr::Object<slr::BinarySaveLoadContext>, public slr::Object<slr::json::JsonSaveLoadContext>
 {
 public:
     std::string name = "Bar2";
@@ -36,14 +36,14 @@ public:
         slr::serialize(h, context, slr::BinaryLoadInfo());
     }
 
-    void serialize(slr::JsonSaveContext& context)
+    void serialize(slr::json::JsonSaveContext& context)
     {
-        slr::serialize(h, context, slr::JsonSaveInfo("h"));
+        slr::serialize(h, context, slr::json::JsonSaveInfo("h"));
     }
 
-    void serialize(slr::JsonLoadContext& context)
+    void serialize(slr::json::JsonLoadContext& context)
     {
-        slr::serialize(h, context, slr::JsonLoadInfo("h"));
+        slr::serialize(h, context, slr::json::JsonLoadInfo("h"));
     }
 
     std::string& getName()
@@ -62,25 +62,28 @@ public:
     std::shared_ptr<Bar> bar;
     std::weak_ptr<Bar> bar2;
     std::unique_ptr<Bar> bar3;
+    Bar bar4;
 
-    void serialize(slr::JsonSaveContext& context)
+    void serialize(slr::json::JsonSaveContext& context)
     {
-        slr::serialize(a, context, slr::JsonSaveInfo("a"));
-        slr::serialize(b, context, slr::JsonSaveInfo("b"));
-        slr::serialize(c, context, slr::JsonSaveInfo("c"));
-        slr::serialize(bar, context, slr::JsonSaveInfo("bar"));
-        // slr::serialize(bar2, context, slr::JsonSaveInfo("bar2"));
-        // slr::serialize(bar3, context, slr::JsonSaveInfo("bar3"));
+        slr::serialize(a, context, slr::json::JsonSaveInfo("a"));
+        slr::serialize(b, context, slr::json::JsonSaveInfo("b"));
+        slr::serialize(c, context, slr::json::JsonSaveInfo("c"));
+        slr::serialize(bar, context, slr::json::JsonSaveInfo("bar"));
+        // slr::serialize(bar2, context, slr::json::JsonSaveInfo("bar2"));
+        // slr::serialize(bar3, context, slr::json::JsonSaveInfo("bar3"));
+        slr::serialize(bar4, context, slr::json::JsonSaveInfo("bar4"));
     }
 
-    void serialize(slr::JsonLoadContext& context)
+    void serialize(slr::json::JsonLoadContext& context)
     {
-        slr::serialize(a, context, slr::JsonLoadInfo("a"));
-        slr::serialize(b, context, slr::JsonLoadInfo("b"));
-        slr::serialize(c, context, slr::JsonLoadInfo("c"));
-        slr::serialize(bar, context, slr::JsonLoadInfo("bar"));
-        // slr::serialize(bar2, context, slr::JsonSaveInfo("bar2"));
-        // slr::serialize(bar3, context, slr::JsonSaveInfo("bar3"));
+        slr::serialize(a, context, slr::json::JsonLoadInfo("a"));
+        slr::serialize(b, context, slr::json::JsonLoadInfo("b"));
+        slr::serialize(c, context, slr::json::JsonLoadInfo("c"));
+        slr::serialize(bar, context, slr::json::JsonLoadInfo("bar"));
+        // slr::serialize(bar2, context, slr::json::JsonLoadInfo("bar2"));
+        // slr::serialize(bar3, context, slr::json::JsonLoadInfo("bar3"));
+        slr::serialize(bar4, context, slr::json::JsonLoadInfo("bar4"));
     }
 
     void serialize(slr::BinarySaveContext& context)
@@ -134,12 +137,12 @@ slr::LoadContextPointerExtension::ObjectType* BinaryLoadContextExtension::loadOb
 }
 
 
-class JsonSaveContextExtension : public slr::json::SaveContextPointerExtension
+class JsonSaveContextExtension : public slr::json::ptr::SaveContextPointerExtension
 {
-    virtual void saveObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj) override;
+    virtual void saveObject(slr::json::JsonSaveContext& context, slr::Object<slr::json::JsonSaveContext>& obj) override;
 };
 
-void JsonSaveContextExtension::saveObject(slr::JsonSaveContext& context, slr::Object<slr::JsonSaveContext>& obj)
+void JsonSaveContextExtension::saveObject(slr::json::JsonSaveContext& context, slr::Object<slr::json::JsonSaveContext>& obj)
 {
     // Save Object type info
     // size_t typeID = obj.getTypeID();
@@ -150,13 +153,13 @@ void JsonSaveContextExtension::saveObject(slr::JsonSaveContext& context, slr::Ob
     obj.serialize(context);
 }
 
-class JsonLoadContextExtension : public slr::json::LoadContextPointerExtension
+class JsonLoadContextExtension : public slr::json::ptr::LoadContextPointerExtension
 {
-    virtual ObjectType* loadObject(slr::JsonLoadContext& context) override;
+    virtual ObjectType* loadObject(slr::json::JsonLoadContext& context) override;
     virtual ObjectType* loadFileObject(const std::string& objectName) override; // Loads an object from another context
 };
 
-slr::json::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::loadObject(slr::JsonLoadContext& context)
+slr::json::ptr::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::loadObject(slr::json::JsonLoadContext& context)
 {
     // size_t typeID;
     // slr::serialize(typeID, context, slr::JsonLoadInfo());
@@ -166,20 +169,16 @@ slr::json::LoadContextPointerExtension::ObjectType* JsonLoadContextExtension::lo
     return ptr;
 }
 
-#include <fstream>
-#include <iostream>
-#include <sstream> //std::stringstream
-
 #include <Salieri/file.hpp>
 
 JsonLoadContextExtension::ObjectType* JsonLoadContextExtension::loadFileObject(const std::string& objectName)
 {
     auto it = alreadySavedObjects.find(objectName);
-    slr::JsonLoadContext* newContext; 
+    slr::json::JsonLoadContext* newContext; 
     if (it == alreadySavedObjects.end()) 
     {
         // Load new file
-        newContext = new slr::JsonLoadContext(*this);
+        newContext = new slr::json::JsonLoadContext(*this);
         slr::ReadFile f = ("SavedJSON/" + objectName);
         newContext->parse(f.toStr());
         alreadySavedObjects.emplace(objectName, newContext);
@@ -295,7 +294,7 @@ void test<slr::BinarySaveLoadContext>()
 }
 
 template<>
-void test<slr::JsonSaveLoadContext>()
+void test<slr::json::JsonSaveLoadContext>()
 {
     try 
     {
@@ -306,6 +305,143 @@ void test<slr::JsonSaveLoadContext>()
     {
         std::cout << e.what() << std::endl;
     }
+}
+
+// bool isDifferent(nlohmann::json& doc1, nlohmann::json& doc2)
+// {
+//     if (doc1.is_object())
+//     {
+//         bool isDifferent = false;
+//         for (auto& doc : doc1)
+//         {
+            
+//         }
+//     }
+//     else 
+//     {
+//         doc1.dif
+//     }
+// }
+
+
+static nlohmann::json diff(const nlohmann::json& source, const nlohmann::json& target,
+                        const std::string& path = "")
+{
+    // the patch
+    nlohmann::json result({});
+
+    // if the values are the same, return empty patch
+    if (source == target)
+    {
+        return result;
+    }
+
+    if (source.type() != target.type())
+    {
+        // different types: replace value
+        result = target;
+        return result;
+    }
+
+    switch (source.type())
+    {
+        case nlohmann::json::value_t::array:
+        {
+            // // first pass: traverse common elements
+            // std::size_t i = 0;
+            // while (i < source.size() && i < target.size())
+            // {
+            //     // recursive call to compare array values at index i
+            //     auto temp_diff = diff(source[i], target[i], path + "/" + std::to_string(i));
+            //     result.insert(result.end(), temp_diff.begin(), temp_diff.end());
+            //     ++i;
+            // }
+
+            // // i now reached the end of at least one array
+            // // in a second pass, traverse the remaining elements
+
+            // // remove my remaining elements
+            // const auto end_index = static_cast<nlohmann::json::difference_type>(result.size());
+            // while (i < source.size())
+            // {
+            //     // add operations in reverse order to avoid invalid
+            //     // indices
+            //     result.insert(result.begin() + end_index, object(
+            //     {
+            //         {"op", "remove"},
+            //         {"path", path + "/" + std::to_string(i)}
+            //     }));
+            //     ++i;
+            // }
+
+            // // add other remaining elements
+            // while (i < target.size())
+            // {
+            //     result.push_back(
+            //     {
+            //         {"op", "add"},
+            //         {"path", path + "/-"},
+            //         {"value", target[i]}
+            //     });
+            //     ++i;
+            // }
+
+            break;
+        }
+
+        case nlohmann::json::value_t::object:
+        {
+            // first pass: traverse this object's elements
+            for (auto it = source.cbegin(); it != source.cend(); ++it)
+            {
+                // escape the key name to be used in a JSON patch
+                const auto path_key = path + it.key();
+
+                if (target.find(it.key()) != target.end())
+                {
+                    // recursive call to compare object values at key it
+                    auto temp_diff = diff(it.value(), target[it.key()], it.key()/*path_key*/);
+
+                    for (auto it2 = temp_diff.cbegin(); it2 != temp_diff.cend(); ++it2)
+                    {
+                        if (it->is_object())
+                        {
+                            result[it.key()][it2.key()] = it2.value();
+                        }
+                        else 
+                        {
+                            result[it.key()] = it2.value();
+                        }
+                    }
+                }
+                else
+                {
+                    // found a key that is not in o -> remove it
+                    result[it.key()] = nullptr;
+                }
+            }
+
+            // second pass: traverse other object's elements
+            for (auto it = target.cbegin(); it != target.cend(); ++it)
+            {
+                if (source.find(it.key()) == source.end())
+                {
+                    // found a key that is not in this -> add it
+                    result[it.key()] = it.value();
+                }
+            }
+
+            break;
+        }
+
+        default:
+        {
+            result = target;
+            break;
+        }
+    }
+
+    return result;
 }
 
 int main()
@@ -324,6 +460,47 @@ int main()
 
     std::string dirName = "SavedJSON/";
 
+    slr::json::Doc doc;
+    // slr::json::ptr::Doc doc;
+    {
+        {
+        int i = 5;
+        doc.save(i, slr::json::JsonSaveInfo{"i"});
+        }
+
+        // slr::File file = dirName + "TEEEEEEEEEEEEEEEEST";
+        // file << doc.toJson();
+        {
+        slr::WriteFile file = dirName + "TEEEEEEEEEEEEEEEEST";
+        file << doc.toBson();
+        }
+
+        {
+        slr::ReadFile file2 = dirName + "TEEEEEEEEEEEEEEEEST";
+        
+        doc.fromBson(file2.toBytes());
+        }
+
+        {
+        int i = 2;
+        doc.load(i, slr::json::JsonLoadInfo{"i"});
+        std::cout << i << std::endl;
+        }
+    }
+
+    // slr::json::Doc doc;
+    // {
+    //     {
+    //     int i = 5;
+    //     doc.save(i, {"i"});
+    //     }
+    //     {
+    //     int i = 2;
+    //     doc.load(i, {"i"});
+    //     std::cout << i << std::endl;
+    //     }
+    // }
+
     {
         JsonSaveContextExtension shared1;
         auto& context = shared1.globalContext;
@@ -331,36 +508,53 @@ int main()
         float f = 0.1f;
         // slr::JsonSaveContext::DefaultExtension shared;
         // slr::JsonSaveContext context(shared);
-        slr::serialize(f, context, slr::JsonSaveInfo("f"));
+        slr::serialize(f, context, slr::json::JsonSaveInfo("f"));
         int u = 889;
-        slr::serialize(u, context, slr::JsonSaveInfo("u"));
+        slr::serialize(u, context, slr::json::JsonSaveInfo("u"));
+
         std::string str = "Hello world!";
-        slr::serialize(str, context, slr::JsonSaveInfo("str"));
+        slr::serialize(str, context, slr::json::JsonSaveInfo("str"));
+
+        str = "Hello world!!!!!!!!!";
+        slr::serialize(str, context, slr::json::JsonSaveInfo("str"));
+
+
         Foo foo;
         foo.a = 9;
         foo.bar = std::make_shared<Bar>();
+        // foo.bar->h = 3;
+        // slr::serialize(foo, context, slr::json::JsonSaveInfo("foo"));
         foo.bar->h = 100;
-        slr::serialize(foo, context, slr::JsonSaveInfo("foo"));
+        slr::serialize(foo, context, slr::json::JsonSaveInfo("foo"));
+        foo.bar4.h = 3;
+        nlohmann::json doc1 = shared1.globalContext.mainJson;
+        slr::serialize(foo, context, slr::json::JsonSaveInfo("foo"));
+
 
         shared1.toDisk(dirName);
+
+        nlohmann::json doc2 = diff(doc1, shared1.globalContext.mainJson);
+
+        std::cout << "=======\n";
+        std::cout << diff(doc1, shared1.globalContext.mainJson).dump(3) << std::endl;
+        // std::cout << shared1.globalContext.getJson() << std::endl;
+        std::cout << "=======\n";
     }
 
     {
         JsonLoadContextExtension shared1;
         auto& context = shared1.globalContext;
-        slr::ReadFile file = dirName + "__global";
-        shared1.globalContext.parse(file.toStr());
 
         shared1.fromDisk(dirName);
 
         float f;
-        slr::serialize(f, context, slr::JsonLoadInfo("f"));
+        slr::serialize(f, context, slr::json::JsonLoadInfo("f"));
         int u;
-        slr::serialize(u, context, slr::JsonLoadInfo("u"));
+        slr::serialize(u, context, slr::json::JsonLoadInfo("u"));
         std::string str;
-        slr::serialize(str, context, slr::JsonLoadInfo("str"));
+        slr::serialize(str, context, slr::json::JsonLoadInfo("str"));
         Foo foo;
-        slr::serialize(foo, context, slr::JsonLoadInfo("foo"));
+        slr::serialize(foo, context, slr::json::JsonLoadInfo("foo"));
 
         std::cout << f << " / " << u << " / " << str << std::endl;
         std::cout << foo.a << std::endl;
