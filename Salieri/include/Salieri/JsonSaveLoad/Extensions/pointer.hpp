@@ -71,7 +71,7 @@ public:
     }
 };
 
-class Doc : public json::Doc
+class Doc : protected json::Doc
 {
     std::map<std::string /* name */, nlohmann::json> alreadySavedObjects;
 
@@ -113,6 +113,12 @@ public:
     void load(T& data, const JsonLoadInfo& info)
     {
         Super::load<LoadContextPointerExtension, T>(data, info);
+    }
+
+    void reset()
+    {
+        Super::reset();
+        alreadySavedObjects.clear();
     }
 };
 

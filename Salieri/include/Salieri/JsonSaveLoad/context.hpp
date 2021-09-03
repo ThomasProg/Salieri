@@ -238,6 +238,61 @@ public:
     {
         load<DefaultLoadExtension, T>(data, info);
     }
+
+    void reset()
+    {
+        mainJson.clear();
+    }
+
+    std::string toJson(int indent = -1) const
+    {
+        return mainJson.dump(indent);
+    }
+
+    std::vector<std::uint8_t> toBson() const
+    {
+        return nlohmann::json::to_bson(mainJson);
+    }
+
+    std::vector<std::uint8_t> toCbor() const
+    {
+        return nlohmann::json::to_cbor(mainJson);
+    }
+
+    std::vector<std::uint8_t> toMessagePack() const
+    {
+        return nlohmann::json::to_msgpack(mainJson);
+    }
+
+    std::vector<std::uint8_t> toUbjson() const
+    {
+        return nlohmann::json::to_ubjson(mainJson);
+    }
+
+    void fromJson(const std::string& json) 
+    {
+        mainJson = nlohmann::json::parse(json);
+    }
+
+    void fromBson(const std::vector<std::uint8_t>& rawData) 
+    {
+        mainJson = nlohmann::json::from_bson(rawData);
+    }
+
+    void fromCbor(const std::vector<std::uint8_t>& rawData) 
+    {
+        mainJson = nlohmann::json::from_cbor(rawData);
+    }
+
+    void fromMessagePack(const std::vector<std::uint8_t>& rawData) 
+    {
+        mainJson = nlohmann::json::from_msgpack(rawData);
+    }
+
+    void fromUbjson(const std::vector<std::uint8_t>& rawData) 
+    {
+        mainJson = nlohmann::json::from_ubjson(rawData);
+    }
 };
 }
 

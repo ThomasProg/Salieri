@@ -460,19 +460,46 @@ int main()
 
     std::string dirName = "SavedJSON/";
 
-    // slr::json::Doc doc;
-    slr::json::ptr::Doc doc;
+    slr::json::Doc doc;
+    // slr::json::ptr::Doc doc;
     {
         {
         int i = 5;
-        doc.slr::json::Doc::save<JsonSaveContextExtension, decltype(i)>(i, slr::json::JsonSaveInfo{"i"});
+        doc.save(i, slr::json::JsonSaveInfo{"i"});
         }
+
+        // slr::File file = dirName + "TEEEEEEEEEEEEEEEEST";
+        // file << doc.toJson();
+        {
+        slr::WriteFile file = dirName + "TEEEEEEEEEEEEEEEEST";
+        file << doc.toBson();
+        }
+
+        {
+        slr::ReadFile file2 = dirName + "TEEEEEEEEEEEEEEEEST";
+        
+        doc.fromBson(file2.toBytes());
+        }
+
         {
         int i = 2;
-        doc.slr::json::Doc::load<JsonLoadContextExtension, decltype(i)>(i, slr::json::JsonLoadInfo{"i"});
+        doc.load(i, slr::json::JsonLoadInfo{"i"});
         std::cout << i << std::endl;
         }
     }
+
+    // slr::json::Doc doc;
+    // {
+    //     {
+    //     int i = 5;
+    //     doc.save(i, {"i"});
+    //     }
+    //     {
+    //     int i = 2;
+    //     doc.load(i, {"i"});
+    //     std::cout << i << std::endl;
+    //     }
+    // }
 
     {
         JsonSaveContextExtension shared1;
